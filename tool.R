@@ -1,5 +1,4 @@
 designV2M <- function(v_design, n, d) {
-  
   tmp <- as.vector(t(v_design[,1:d]))		
   wt <- sqrt(as.vector(v_design[,ncol(v_design)]))
   ang <- numeric(n-1)
@@ -12,7 +11,6 @@ designV2M <- function(v_design, n, d) {
   m_design <- c(tmp, ang)
   return(m_design)
 }
-
 
 designM2V <- function(m_design, n, d) {
   # weight of support points

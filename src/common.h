@@ -74,8 +74,10 @@ double matrixMean(const arma::mat &m, const arma::uword &ctype, const arma::rowv
 			}
 			case 2: { // E
 				//if (rcond(m) > (datum::eps*((double)m.n_cols))) {
-					//vec eigval; eig_sym(eigval, m.i()); val = eigval.max(); 	
-					vec eigval; eig_sym(eigval, 1e4*m); val = -1.0*eigval.min(); 	
+				//vec eigval; eig_sym(eigval, m.i()); val = eigval.max(); 	
+				arma::vec eigval; 
+			  arma::eig_sym(eigval, m);
+			  val = -1.0*eigval.min(); 	
 				//}
 				break;
 			}
@@ -94,31 +96,32 @@ double matrixMean(const arma::mat &m, const arma::uword &ctype, const arma::rowv
 
 arma::rowvec directionalDerivative(const arma::rowvec &fDev, const arma::mat &inv_FIM, const double &criVal, const arma::uword &ctype, const arma::rowvec &linear) 
 {
-	rowvec DD(2); // (L <= R)
+	arma::rowvec DD(2); 
 	switch (ctype) {
 		case 0: { // D
-	    DD << as_scalar(fDev*inv_FIM*fDev.t()) << (double)inv_FIM.n_cols << endr; 
+	    DD << arma::as_scalar(fDev*inv_FIM*fDev.t()) << (double)inv_FIM.n_cols << endr; 
 	    break; 
 	  }
 	  case 1: { // A
-		  DD << as_scalar(fDev*inv_FIM*inv_FIM*fDev.t()) << criVal << endr; 
+		  DD << arma::as_scalar(fDev*inv_FIM*inv_FIM*fDev.t()) << criVal << endr; 
 		  break; 
 		}
 		case 2: { // E
 			arma::mat FIM = inv_FIM;
 			arma::vec eigVal; 
 			arma::mat eigVec; 
-			arma::eig_sym(eigVal, eigVec, 1e4*FIM); 
+			arma::eig_sym(eigVal, eigVec, FIM); 
 			arma::uword min_eig_val = index_min(eigVal);
 			arma::vec min_eig_vec = eigVec.col(min_eig_val);
-			DD << as_scalar(fDev*(min_eig_vec*min_eig_vec.t())*fDev.t()) << eigVal.min()/1e4 << endr;
+			double tmp = arma::as_scalar(fDev*(min_eig_vec*min_eig_vec.t())*fDev.t());
+			DD << tmp << eigVal.min() << endr;
 			break;
 		}
 		case 3: {
-			double tmp = as_scalar(fDev*inv_FIM*linear.t()); 
+			double tmp = arma::as_scalar(fDev*inv_FIM*linear.t()); 
 			DD << tmp*tmp << criVal << endr;
 			break;
 		}
-	}	
+	}
 	return DD;
 }
