@@ -13,7 +13,7 @@ objWrapper <- function(x, n, d, ctype, poly, varpar, a, b) {
 #' Particle Swarm Optimization Algorithms for Finding E-optimal Design of Heteroscedastic Polynomial Model
 #' @param nSupp A integer number of the number of support points. The default is \code{2}.
 #' @param designSpace The vector of the design space, \code{c(lower, upper)} and \code{lower < upper}.  The default is \code{c(-1, 1)}.
-#' @polyOrder The vector of the order of polynomial model terms.  The default is \code{c(0, 1)}.
+#' @param polyOrder The vector of the order of polynomial model terms.  The default is \code{c(0, 1)}.
 #' \code{0} indicates the intercept term. \code{-Inf} indicates the $\log(x)$ term. Otherwise, set \code{a = numerical value} for $x^a$ term.
 #' @param varParam The vector of the variance parameters, \code{c(u, v)} and \code{u >= 0} and \code{v >= 0}.
 #' @param designType \code{"D"}, \code{"A"} or \code{"E"}.  Default is \code{"E"}.
@@ -65,7 +65,7 @@ genHeterPolyE <- function(nSupp = 2, designSpace = c(-1, 1), polyOrder = c(0, 1)
   
   # Run PSO for finding E-optimal design for heteroscedastic polynomial model
   set.seed(seed)
-  res <- globpso(objFunc = objWrapper, lower = low_bound, upper = upp_bound, PSO_INFO = alg_setting,
+  res <- globpso(objFunc = objWrapper, lower = low_bound, upper = upp_bound, PSO_INFO = alg_setting, verbose = verbose,
                  n = infoL$n, d = infoL$d, ctype = infoL$ctype, poly = infoL$poly, 
                  varpar = infoL$param, a = infoL$dsp[1], b = infoL$dsp[2])
   

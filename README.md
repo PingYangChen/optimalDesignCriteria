@@ -1,6 +1,13 @@
 # Using Particle Swarm Optimization Algorithms for Finding E-optimal Design of Heteroscedastic Polynomial Model
 
-Please find the example in the `exmaple.R` file.
+Package Dependency:
+```{r}
+install.packages("globpso")
+install.packages("Rcpp")
+install.packages("RcppArmadillo")
+```
+
+For detailed demonstration of the codes, please find the example in the `exmaple.R` file.
 
 ```{r}
 # Import the main function

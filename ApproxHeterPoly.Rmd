@@ -1,0 +1,152 @@
+---
+title: "Using Particle Swarm Optimization Algorithms for Finding E-optimal Design of Heteroscedastic Polynomial Model"
+author: "Ping-Yang Chen"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: cosmo
+    toc: yes
+    toc_float:
+      collapsed: true
+bibliography: references.bib
+csl: apa.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# It is a Draft!
+# Theoretical Foundation
+
+We revisit @dette1993, where he found selected $E$-optimal designs for polynomial models with response $y$ and its expectation, $E(y)$, is modeled as a polynomial regression  model using a single explanatory factor with $M$ monomials, $p_1, p_2, \ldots, p_M$, i.e.
+\begin{equation}
+E(y) = \eta(x, \boldsymbol\theta) = \theta_0 + \sum_{m = 1}^M \theta_m x^{p_m},~x\in[a, b],~\boldsymbol\theta = (\theta_0, \theta_1, \ldots, \theta_M).
+\end{equation}
+The simplest case is obtained when $(p_1, p_2, \ldots, p_M) = (1, 2, \ldots, M)$, and the regression function becomes a polynomial of degree $M$.
+
+\cite{dette1993} considered polynomial models with heteroscedastic errors where the variance of the response at $x$ is modeled
+as  $\sigma^2/\lambda(x)$, where $\lambda(x)$ is a user-specified efficiency function defined on the design space, $[a, b]$.  He focused on efficiency function of the form 
+\begin{equation}
+\lambda(x) = (x - a)^u (b - x)^v,
+\end{equation}
+where $u$ and $v$ are known constants.
+
+# Implementation
+
+
+## Dependency
+
+```{r pkgins, eval = FALSE}
+install.packages("globpso")
+install.packages("Rcpp")
+install.packages("RcppArmadillo")
+```
+
+## `genHeterPolyE`: The Main Function
+
+| Input Parameters | Illustration                                                                                            | Default Value |
+| ---------------- | ------------------------------------------------------------------------------------------------------- | ------------- |
+| `nSupp`       | A integer number of the number of support points satisfying `nSupp >= 2`.                                       | `2`        |
+| `designSpace` | The vector of the design space, `c(lower, upper)`, satisfying `lower < upper`.                                  | `c(-1, 1)` |
+| `polyOrder`   | The vector of the order of polynomial model terms.  The default is \code{c(0, 1)}.                              | `c(0, 1)`  |
+|               | Set `0` for intercept term and `-Inf` for $\log(x)$ term. Otherwise, set `a` as numerical value for $x^a$ term. |            |
+| `varParam`    | The vector of the variance parameters, \code{c(u, v)} and \code{u >= 0} and \code{v >= 0}.                      | `c(1, 1)`  |
+| `designType`  | The character of type of optimal design criterion including \code{"D"}, \code{"A"} or \code{"E"}.               | `"E"`      |
+| `eqvData`     | The logical value controls if the function returns the data for drawing the equivalence plot.                   | `200`      |
+| `nswarm`      | A integer number of swarm size in PSO algorithm.                                                                | `32`       |
+| `maxiter`     | A integer number of maximal PSO iterations.                                                                     | `100`      |
+| `seed`        | The random seed that controls initial swarm of PSO.                                                             | `NULL`     |
+| `verbose`     | The logical value controls if PSO would reports the updating progress.                                          | `TRUE`     |
+
+
+# Examples
+
+```{r import}
+# Import the main function
+source("Approx_HeterPoly.R")
+```
+
+## Case 1
+
+```{r case1set}
+# Set the design requirements
+n <- 2                # the number of support points
+dSpace <- c(-1, 1)    # the design space, c(lower, upper)
+pOrder <- c(0, 1)     # the order of polynomial model terms
+                      # 0: intercept
+                      # -Inf: log(x)
+                      # a: x^a, a is numerical value
+vParam <- c(1.5, 0.5) # the variance parameters, c(u, v)
+```
+
+```{r case1run}
+# Run PSO for Finding E-optimal Design of Heteroscedastic Polynomial Model
+out <- genHeterPolyE(nSupp = n, designSpace = dSpace, polyOrder = pOrder, 
+              varParam = vParam, designType = "E", 
+              eqvData = TRUE, nswarm = 32, maxiter = 100, seed = NULL, verbose = FALSE)
+```
+
+```{r case1res}
+# The PSO-generated Design
+out$optDesign
+
+# The corresponding E-criterion value 
+# (NEGATIVE of the minimal eignevalue of FIM)
+out$CritVal
+
+# Computing time
+out$pso_results$cputime
+```
+
+```{r case1plot}
+# Draw the equivalence plot
+plot(out$Equiv$grid, out$Equiv$DD, type = "l", col = "blue")
+abline(h = 0, lty = 3)
+```
+
+## Case 2
+
+Statistical packages like STATA and SAS also provide fitting routines using fractional polynomials, suggesting that fractional polynomials are in demand in practice.  
+Consider, for example, we are interested to find a $E$-optimal design for a fractional polynomial regression model on the interval $[20,80]$, where the variance of the univariate response $y$ is inversely proportional to a known function of the form $\lambda(x)=(x-20)^u(80-x)^v$, where $u, v$ are supposed to be known and different choices of $u$ and $v$ shapes the variance of the response across the design interval. The model is
+\begin{equation}
+E(y) = \theta_0 + \theta_1x^{-2} + \theta_2x^{-1} + \theta_3x^{-0.5} + \theta_4\log{(x)}
+\end{equation}
+
+```{r case2set}
+# Set the design requirements
+n <- 5                # the number of support points
+dSpace <- c(20, 80)    # the design space, c(lower, upper)
+pOrder <- c(0, -2, -1, -0.5, -Inf)     # the order of polynomial model terms
+# 0: intercept
+# Inf: log(x)
+# a: x^a, a is numerical value
+vParam <- c(1.5, 0.5) # the variance parameters, c(u, v)
+```
+
+```{r case2run}
+# Run PSO for Finding E-optimal Design of Heteroscedastic Polynomial Model
+out <- genHeterPolyE(nSupp = n, designSpace = dSpace, polyOrder = pOrder, 
+                     varParam = vParam, designType = "E", 
+                     eqvData = TRUE, nswarm = 128, maxiter = 100, seed = NULL, verbose = FALSE)
+```
+
+```{r case2res}
+# The PSO-generated Design
+out$optDesign
+
+# The corresponding E-criterion value 
+# (NEGATIVE of the minimal eignevalue of FIM)
+out$CritVal
+
+# Computing time
+out$pso_results$cputime
+```
+
+```{r case2plot}
+# Draw the equivalence plot
+plot(out$Equiv$grid, out$Equiv$DD, type = "l", col = "blue")
+abline(h = 0, lty = 3)
+```
+
+# Reference
