@@ -7,7 +7,7 @@ install.packages("Rcpp")
 install.packages("RcppArmadillo")
 ```
 
-For detailed demonstration of the codes, please find the example in the `exmaple.R` file.
+For detailed demonstration of the codes, please find the example in the `example.R` file.
 
 ```{r}
 # Import the main function
