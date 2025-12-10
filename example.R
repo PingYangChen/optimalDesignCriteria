@@ -1,6 +1,12 @@
 
-# Import the main function
+# Import the main functions
+library(globpso)
+source("tool.R")
+library(Rcpp)
+library(RcppArmadillo)
+sourceCpp("src/crit.cpp")
 source("Approx_HeterPoly.R")
+
 
 ### Case 1: 
 ### The Polynomial Model is f(x) = 1 + x

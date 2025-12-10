@@ -1,5 +1,7 @@
 # Using Particle Swarm Optimization Algorithms for Finding E-optimal Design of Heteroscedastic Polynomial Model
 
+Please see the manual: [Github Manual](https://html-preview.github.io/?url=https://github.com/PingYangChen/optimalDesignCriteria/blob/main/ApproxHeterPoly.html)
+
 Package Dependency:
 ```{r}
 install.packages("globpso")

@@ -1,8 +1,3 @@
-library(globpso)
-source("tool.R")
-library(Rcpp)
-library(RcppArmadillo)
-sourceCpp("src/crit.cpp")
 
 # Wrapper function for optimizing optimal Design of Heteroscedastic Polynomial Model
 objWrapper <- function(x, n, d, ctype, poly, varpar, a, b) {
