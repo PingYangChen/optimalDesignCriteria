@@ -12,7 +12,12 @@ install.packages("RcppArmadillo")
 For detailed demonstration of the codes, please find the example in the `example.R` file.
 
 ```{r}
-# Import the main function
+# Import the main functions
+library(globpso)
+source("tool.R")
+library(Rcpp)
+library(RcppArmadillo)
+sourceCpp("src/crit.cpp")
 source("Approx_HeterPoly.R")
 
 ### Case 1: 
